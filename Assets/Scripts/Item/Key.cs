@@ -18,19 +18,13 @@ public class Key : XRGrabInteractable
     
     private void OnTriggerEnter(Collider other)
     {
-        // var door = other.gameObject.GetComponent<Door>();
-        // if (door != null)
-        // {
-        //     if (door.password == password)
-        //     {
-        //         door.UnlockDoorSuccess();
-        //         Destroy(gameObject);
-        //     }
-        //     else
-        //     {
-        //         door.UnlockDoorFailure();
-        //     }
-        // }
+        var door = other.gameObject.GetComponent<Door>();
+        door.TryUnlockDoor(
+            password: password,
+            onSuccess: () => 
+            {
+                Destroy(gameObject);
+            });
     }
     
     private void EnableColliderTrigger()
