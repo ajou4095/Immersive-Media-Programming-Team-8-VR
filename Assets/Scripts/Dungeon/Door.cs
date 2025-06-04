@@ -62,7 +62,7 @@ public class Door : MonoBehaviour
             hingeJoint.limits = new JointLimits
             {
                 min = -90,
-                max = 0
+                max = 90
             };
     }
 }
