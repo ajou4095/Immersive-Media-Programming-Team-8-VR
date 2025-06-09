@@ -53,10 +53,6 @@ public class PatrolAndChaseEnemy : MonoBehaviour
                 ChaseBehavior();
                 break;
         }
-
-        Debug.DrawRay(transform.position + Vector3.up * 1.5f,
-                  (player.position - transform.position).normalized * viewDistance,
-                  Color.red);
     }
 
     void PatrolBehavior()
@@ -114,19 +110,22 @@ public class PatrolAndChaseEnemy : MonoBehaviour
     {
         if (player == null) return false;
 
-        Vector3 toPlayer = player.position - transform.position;
-        float distance = toPlayer.magnitude;
+        Vector3 eyePos = transform.position + Vector3.up * 1.5f;
+        Vector3 toPlayer = player.position - eyePos;
 
+        float distance = toPlayer.magnitude;
         if (distance > viewDistance) return false;
         
         float angle = Vector3.Angle(transform.forward, toPlayer);
         if (angle > viewAngle * 0.5f) return false;
 
         // check obstacles
-        Ray ray = new Ray(transform.position + Vector3.up * 1.5f, toPlayer.normalized);
+        Ray ray = new Ray(eyePos, toPlayer.normalized);
         // ray origin can be changed later if model is too small
         if (Physics.Raycast(ray, out RaycastHit hit, viewDistance))
         {
+            Debug.DrawRay(eyePos, toPlayer.normalized * viewDistance, Color.red);
+
             if (hit.transform.CompareTag("Player") || hit.transform.root.CompareTag("Player"))
             {
                 return true;
