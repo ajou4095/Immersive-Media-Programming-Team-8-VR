@@ -2,12 +2,14 @@ using UnityEngine;
 
 public class GameStartManager : MonoBehaviour
 {
-    public GameObject uiCanvas;         
-    public GameObject gameplayRoot;     
+    public GameObject uiCanvas;
+    public GameObject gameplayRoot;
+    public GameObject panelOverlay;     
 
     public void StartGame()
     {
-        uiCanvas.SetActive(false);      
-        gameplayRoot.SetActive(true);   
+
+        gameplayRoot.SetActive(true);
+        uiCanvas.SetActive(false);
     }
 }
