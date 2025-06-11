@@ -1,22 +1,45 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-    public static Player Inst { get; private set; }
+    [SerializeField] 
+    private int maxHp = 10;
 
-    [SerializeField] int maxHp;
-    [SerializeField] int hp;
+    [SerializeField]
+    private int currentHp;
+
+    [SerializeField] 
+    private Slider healthSlider;
 
     private void Awake()
     {
-        if (maxHp > 0)
+        currentHp = maxHp;
+        UpdateUI();
+    }
+
+    public void TakeDamage(int amount)
+    {
+        currentHp -= amount;
+        currentHp = Mathf.Max(currentHp, 0);
+        UpdateUI();
+
+        if (currentHp <= 0)
         {
-            hp = maxHp;
+            Die();
         }
     }
 
-    public void TakeDamage(int damage)
+    private void UpdateUI()
     {
-        this.hp -= damage;
+        if (healthSlider != null)
+        {
+            healthSlider.value = (float)currentHp / maxHp;
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log("Gameover");
     }
 }
