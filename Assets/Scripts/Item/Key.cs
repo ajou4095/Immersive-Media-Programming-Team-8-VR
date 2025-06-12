@@ -5,7 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 public class Key : XRGrabInteractable
 {
     public string password;
-    
+
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
         EnableColliderTrigger();
@@ -15,18 +15,27 @@ public class Key : XRGrabInteractable
     {
         DisableColliderTrigger();
     }
-    
+
     private void OnTriggerEnter(Collider other)
     {
-        var door = other.gameObject.GetComponent<Door>();
+        var door = other.GetComponent<Door>();
+        if (door == null) return;
+
         door.TryUnlockDoor(
             password: password,
-            onSuccess: () => 
+            onSuccess: () =>
             {
+                
                 Destroy(gameObject);
+
+                var gm = FindObjectOfType<GameManager>();
+                if (gm != null)
+                {
+                    gm.ShowGameClearUI();
+                }
             });
     }
-    
+
     private void EnableColliderTrigger()
     {
         var collider = GetComponent<Collider>();
@@ -35,7 +44,7 @@ public class Key : XRGrabInteractable
             collider.isTrigger = true;
         }
     }
-    
+
     private void DisableColliderTrigger()
     {
         var collider = GetComponent<Collider>();

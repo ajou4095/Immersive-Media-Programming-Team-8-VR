@@ -41,5 +41,11 @@ public class Player : MonoBehaviour
     private void Die()
     {
         Debug.Log("Gameover");
+
+        GameManager gm = FindObjectOfType<GameManager>();
+        if (gm != null)
+        {
+            gm.ShowGameOverUI();
+        }
     }
 }
