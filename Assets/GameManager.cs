@@ -40,14 +40,7 @@ public class GameManager : MonoBehaviour
 
     public void ShowGameOverUI()
     {
-        if (gameOverUI != null)
-        {
-            gameOverUI.SetActive(true);
-        }
-        else
-        {
-            Debug.LogWarning("gameOverUI가 연결되어 있지 않습니다.");
-        }
+        if (gameOverUI != null) gameOverUI.SetActive(true);
     }
 
     public void GoToNextScene()
