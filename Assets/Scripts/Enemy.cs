@@ -1,7 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("HP Settings")]
     [SerializeField]
     int maxHp = 10;
     int hp;
@@ -9,6 +11,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] Player player;
 
     [SerializeField] int damagePerAttack = 2;
+
+    [Header("Damage Cooldown Settings")]
+    [SerializeField] float damageCooldown = 0.5f;
+    private bool canTakeDamage = true;
 
     private void Awake()
     {
@@ -21,10 +27,16 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        hp -= damage;
-        if (hp <= 0)
+        if (canTakeDamage)
         {
-            Die();
+            hp -= damage;
+
+
+
+            if (hp <= 0)
+            {
+                Die();
+            }
         }
     }
 
@@ -33,4 +45,10 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
+    private IEnumerator DamageCooldownCoroutine()
+    {
+        canTakeDamage = false;
+        yield return new WaitForSeconds(damageCooldown);
+        canTakeDamage = true;
+    }
 }
