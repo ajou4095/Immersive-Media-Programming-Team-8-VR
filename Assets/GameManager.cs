@@ -40,7 +40,14 @@ public class GameManager : MonoBehaviour
 
     public void ShowGameOverUI()
     {
-        if (gameOverUI != null) gameOverUI.SetActive(true);
+        if (gameOverUI != null)
+        {
+            gameOverUI.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("gameOverUI가 연결되어 있지 않습니다.");
+        }
     }
 
     public void GoToNextScene()
@@ -54,4 +61,10 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("There is no next scene.");
         }
     }
+    public void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+
 }
