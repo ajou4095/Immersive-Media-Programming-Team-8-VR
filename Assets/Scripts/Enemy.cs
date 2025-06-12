@@ -8,13 +8,16 @@ public class Enemy : MonoBehaviour
     int maxHp = 10;
     int hp;
 
+    [Header("Damage Cooldown Settings")]
+    [SerializeField] float damageCooldown = 0.5f;
+    private bool canTakeDamage = true;
+
+    [Header("Other Settings")]
     [SerializeField] Player player;
 
     [SerializeField] int damagePerAttack = 2;
 
-    [Header("Damage Cooldown Settings")]
-    [SerializeField] float damageCooldown = 0.5f;
-    private bool canTakeDamage = true;
+    Animator animator;
 
     private void Awake()
     {
@@ -23,6 +26,7 @@ public class Enemy : MonoBehaviour
         {
             player = FindAnyObjectByType(typeof(Player)) as Player;
         }
+        animator = GetComponent<Animator>();
     }
 
     public void TakeDamage(int damage)
@@ -31,18 +35,19 @@ public class Enemy : MonoBehaviour
         {
             hp -= damage;
 
-
-
             if (hp <= 0)
             {
                 Die();
             }
+
+            StartCoroutine(DamageCooldownCoroutine());
         }
     }
 
     private void Die()
     {
-        Destroy(gameObject);
+        animator.SetBool("isDead", true);
+        Destroy(gameObject, 3.5f);
     }
 
     private IEnumerator DamageCooldownCoroutine()

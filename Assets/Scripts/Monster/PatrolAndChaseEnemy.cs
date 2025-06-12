@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -17,15 +18,30 @@ public class PatrolAndChaseEnemy : MonoBehaviour
     [SerializeField] private float chaseTimeout = 3f;
     private float chaseTimer = 0f;
 
-    private enum State { Patrol, Chase }
+    private enum State { Patrol, Chase, Attack }
     private State currentState = State.Patrol;
 
     private NavMeshAgent agent;
     public event Action onArrived;
 
+    [Header("Attack Settings")]
+    [SerializeField] private float attackDistance = 2f;
+    [SerializeField] private float attackCooldown = 1.5f;
+    [SerializeField] private float attackDelay = 0.5f;
+    [SerializeField] private float attackDuration = 1.2f;
+    private bool isAttacking = false;
+    private float lastAttackTime = -999f;
+
+    Animator animator;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("MainCamera").transform;
+        }
+        animator = GetComponent<Animator>();
     }
 
     void Start()
@@ -52,7 +68,28 @@ public class PatrolAndChaseEnemy : MonoBehaviour
             case State.Chase:
                 ChaseBehavior();
                 break;
+
+            case State.Attack:
+                AttackBehavior();
+                break;
         }
+
+        if (isAttacking)
+        {
+            LookAtPlayer();
+        }
+    }
+
+    private void LateUpdate()
+    {
+        float speed = agent.velocity.magnitude;
+
+        animator.SetFloat("Speed", speed);
+
+        if (speed > 0) { animator.SetBool("isWalking", true); }
+        else { animator.SetBool("isWalking", false); }
+
+        if (isAttacking) { animator.SetBool("isAttacking", true); }
     }
 
     void PatrolBehavior()
@@ -67,8 +104,16 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
     void ChaseBehavior()
     {
-        if (player != null)
+        if (player != null && !isAttacking)
             agent.SetDestination(player.position);
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        if (distanceToPlayer <= attackDistance)
+        {
+            SwitchToAttack();
+            return;
+        }
 
         if (CanSeePlayer())
         {
@@ -79,6 +124,20 @@ public class PatrolAndChaseEnemy : MonoBehaviour
             chaseTimer += Time.deltaTime;
             if (chaseTimer >= chaseTimeout)
                 SwitchToPatrol();
+        }
+    }
+
+    void AttackBehavior()
+    {
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer > attackDistance)
+        {
+            SwitchToChase();
+            return;
+        }
+        if (Time.time > lastAttackTime + attackCooldown && !isAttacking)
+        {
+            StartCoroutine(AttackCoroutine());
         }
     }
 
@@ -95,7 +154,7 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         currentState = State.Chase;
         chaseTimer = 0f;
         Debug.Log("Swithed to Chase");
-        // TODO: add sound effects
+        // TODO: add sound effects if the state was patrol
     }
 
     void SwitchToPatrol()
@@ -104,6 +163,11 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         SetNextDestination();
 
         // TODO: add sound effects
+    }
+
+    void SwitchToAttack()
+    {
+        currentState = State.Attack;
     }
 
     bool CanSeePlayer()
@@ -137,5 +201,45 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         }
 
         return false;
+    }
+
+    IEnumerator AttackCoroutine()
+    {
+        isAttacking = true;
+        lastAttackTime = Time.time;
+
+        agent.isStopped = true;
+        //agent.updatePosition = false;
+        // TODO: animator setting
+        // animator.SetTrigger("Attack");
+
+        yield return new WaitForSeconds(attackDelay);
+
+        // TODO: Damage to Player
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer <= attackDistance)
+        {
+            Debug.Log($"{gameObject.name} attacked!");
+        }
+        yield return new WaitForSeconds(attackDuration - attackDelay);
+
+        agent.isStopped = false;
+        //agent.updatePosition = true;
+        isAttacking = false;
+
+        yield return new WaitForSeconds(0.5f);
+        SwitchToChase();
+    }
+
+    void LookAtPlayer()
+    {
+        Vector3 direction = (player.position - transform.position).normalized;
+        direction.y = 0f;
+
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 1f);
+        }
     }
 }

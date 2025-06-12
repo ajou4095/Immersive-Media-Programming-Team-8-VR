@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
     {
         Debug.Log("Gameover");
 
-        GameManager gm = FindObjectOfType<GameManager>();
+        GameManager gm = FindAnyObjectByType<GameManager>();
         if (gm != null)
         {
             gm.ShowGameOverUI();
