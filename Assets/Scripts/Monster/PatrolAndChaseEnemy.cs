@@ -82,14 +82,18 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
     private void LateUpdate()
     {
-        float speed = agent.velocity.magnitude;
+        if (!isAttacking) 
+        {
+            float speed = agent.velocity.magnitude;
 
-        animator.SetFloat("Speed", speed);
-
-        if (speed > 0) { animator.SetBool("isWalking", true); }
-        else { animator.SetBool("isWalking", false); }
-
-        if (isAttacking) { animator.SetBool("isAttacking", true); }
+            animator.SetFloat("Speed", speed);
+            animator.SetBool("isWalking", speed > 0.01f);
+        }
+        else
+        {
+            animator.SetFloat("Speed", 0);
+            animator.SetBool("isWalking", false);
+        }
     }
 
     void PatrolBehavior()
@@ -209,9 +213,10 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         lastAttackTime = Time.time;
 
         agent.isStopped = true;
-        //agent.updatePosition = false;
+        //agent.enabled = false;
         // TODO: animator setting
         // animator.SetTrigger("Attack");
+        animator.SetBool("isAttacking", true);
 
         yield return new WaitForSeconds(attackDelay);
 
@@ -223,11 +228,14 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         }
         yield return new WaitForSeconds(attackDuration - attackDelay);
 
-        agent.isStopped = false;
-        //agent.updatePosition = true;
-        isAttacking = false;
+        
 
         yield return new WaitForSeconds(0.5f);
+        //agent.enabled = true;
+        agent.isStopped = false;
+        isAttacking = false;
+        animator.SetBool("isAttacking", false);
+
         SwitchToChase();
     }
 
