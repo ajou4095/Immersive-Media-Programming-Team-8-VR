@@ -3333,6 +3333,34 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "SwitchRayMode",
+            "id": "75df0bfa-a4e5-489e-a33c-d8b4ac2b8b03",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "47ffd5f2-102b-48cf-b716-5dfc63b97c4b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2fd7536d-d19d-458f-bf10-6d14205b89a3",
+                    "path": "<OculusTouchController>{RightHand}/gripPressed",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
