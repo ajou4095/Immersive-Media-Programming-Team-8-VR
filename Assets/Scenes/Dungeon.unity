@@ -93768,15 +93768,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4924610844455893679, guid: 8dba1635a160796489ff484b80a7ebe5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.7999995
+      value: 0.868
       objectReference: {fileID: 0}
     - target: {fileID: 4924610844455893679, guid: 8dba1635a160796489ff484b80a7ebe5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.72100717
+      value: 1.093
       objectReference: {fileID: 0}
     - target: {fileID: 4924610844455893679, guid: 8dba1635a160796489ff484b80a7ebe5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.8173885
+      value: 2.191
       objectReference: {fileID: 0}
     - target: {fileID: 4924610844455893679, guid: 8dba1635a160796489ff484b80a7ebe5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -132449,6 +132449,7 @@ MonoBehaviour:
   viewDistance: 10
   viewAngle: 90
   chaseTimeout: 3
+  currentState: 0
   attackDistance: 2
   attackCooldown: 1.5
   attackDelay: 0.5

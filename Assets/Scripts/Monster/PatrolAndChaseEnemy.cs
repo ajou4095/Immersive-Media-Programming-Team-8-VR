@@ -18,8 +18,8 @@ public class PatrolAndChaseEnemy : MonoBehaviour
     [SerializeField] private float chaseTimeout = 3f;
     private float chaseTimer = 0f;
 
-    private enum State { Patrol, Chase, Attack }
-    private State currentState = State.Patrol;
+    [HideInInspector] public enum State { Patrol, Chase, Attack }
+    [HideInInspector] public State currentState = State.Patrol;
 
     private NavMeshAgent agent;
     public event Action onArrived;
@@ -166,7 +166,7 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         agent.SetDestination(patrolTargets[currentIndex].position);
     }
 
-    void SwitchToChase()
+    public void SwitchToChase()
     {
         currentState = State.Chase;
         chaseTimer = 0f;

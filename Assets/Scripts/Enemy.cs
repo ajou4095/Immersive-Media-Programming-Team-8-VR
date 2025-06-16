@@ -28,6 +28,8 @@ public class Enemy : MonoBehaviour
 
     public bool isDead = false;
 
+    private PatrolAndChaseEnemy patrolAndChaseEnemy;
+
     private void Awake()
     {
         hp = maxHp;
@@ -40,6 +42,7 @@ public class Enemy : MonoBehaviour
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         agent = GetComponent<NavMeshAgent>();
+        patrolAndChaseEnemy = GetComponent<PatrolAndChaseEnemy>();
     }
 
     public void TakeDamage(int damage)
@@ -49,6 +52,10 @@ public class Enemy : MonoBehaviour
         hp -= damage;
         hp = Mathf.Clamp(hp, 0, maxHp);
 
+        if (patrolAndChaseEnemy.currentState == PatrolAndChaseEnemy.State.Patrol)
+        {
+            patrolAndChaseEnemy.SwitchToChase();
+        }
 
         if (hp <= 0 && !isDead)
         {
