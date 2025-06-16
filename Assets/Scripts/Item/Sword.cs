@@ -5,8 +5,6 @@ public class Sword : MonoBehaviour
     [SerializeField] int damage = 2;
 
     private bool isHeld = false;
-
-    // Inspector에서 연결 가능한 메서드
     public void SetHeldTrue()
     {
         isHeld = true;
@@ -17,13 +15,13 @@ public class Sword : MonoBehaviour
         isHeld = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
         if (!isHeld) return;
 
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (other.gameObject.CompareTag("Enemy"))
         {
-            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            Enemy enemy = other.gameObject.GetComponent<Enemy>();
             if (enemy != null)
             {
                 enemy.TakeDamage(damage);
