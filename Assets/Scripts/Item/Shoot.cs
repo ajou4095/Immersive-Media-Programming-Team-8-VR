@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR;
 using System.Collections;
 
 public class Shoot : MonoBehaviour
@@ -24,9 +25,18 @@ public class Shoot : MonoBehaviour
             bulletLine.enabled = false;
     }
 
+    private void Update()
+    {
+        InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+
+        if (rightController.TryGetFeatureValue(CommonUsages.primaryButton, out bool isPressed) && isPressed)
+        {
+            Fire();
+        }
+    }
+
     public void Fire()
     {
-        // 1. 라인 이펙트 및 레이캐스트
         Ray ray = new Ray(muzzle.position, muzzle.forward);
         Vector3 endPoint = muzzle.position + muzzle.forward * maxDistance;
 
@@ -46,13 +56,13 @@ public class Shoot : MonoBehaviour
             if (hitEffectPrefab != null)
             {
                 Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+                Destroy(hitEffectPrefab, 3f);
             }
         }
 
         if (bulletLine != null)
             StartCoroutine(ShowBulletLine(muzzle.position, endPoint));
 
-        // 2. 총알 프리팹 생성 (시각적 효과용)
         if (bulletPrefab != null)
         {
             GameObject bulletInstance = Instantiate(bulletPrefab, muzzle.position, muzzle.rotation);
@@ -62,7 +72,6 @@ public class Shoot : MonoBehaviour
             Destroy(bulletInstance, 2f);
         }
 
-        // 3. 사운드
         if (audioSource != null)
             audioSource.Play();
     }
