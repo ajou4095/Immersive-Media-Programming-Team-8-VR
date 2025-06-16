@@ -54,10 +54,14 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("There is no next scene.");
         }
     }
+
     public void RestartScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-
+    public void OnGameOverConfirmed()
+    {
+        GoToNextScene();
+    }
 }
