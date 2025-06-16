@@ -1,7 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
+
+/*
+ * This script controls enemy's Health Points.
+ */
 
 public class Enemy : MonoBehaviour
 {
@@ -45,6 +48,7 @@ public class Enemy : MonoBehaviour
         patrolAndChaseEnemy = GetComponent<PatrolAndChaseEnemy>();
     }
 
+    // enemy takes damage with this
     public void TakeDamage(int damage)
     {
         if (!canTakeDamage) return;
@@ -52,6 +56,7 @@ public class Enemy : MonoBehaviour
         hp -= damage;
         hp = Mathf.Clamp(hp, 0, maxHp);
 
+        // enemy follows player when he attacks even if it didn't know where player is.
         if (patrolAndChaseEnemy.currentState == PatrolAndChaseEnemy.State.Patrol)
         {
             patrolAndChaseEnemy.SwitchToChase();
@@ -65,8 +70,7 @@ public class Enemy : MonoBehaviour
         StartCoroutine(DamageCooldownCoroutine());
     }
 
-    
-
+    // stop moving and disappear
     private void Die()
     {
         animator.SetTrigger("isDead");
@@ -76,6 +80,7 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject, 3.5f);
     }
 
+    // need cooldown not to get multiple damage at once
     private IEnumerator DamageCooldownCoroutine()
     {
         canTakeDamage = false;

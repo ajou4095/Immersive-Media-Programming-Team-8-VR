@@ -3,6 +3,11 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
+/*
+ * This scrtip controls enemy's movement.
+ * It patrols, chases and attacks player.
+ */
+
 public class PatrolAndChaseEnemy : MonoBehaviour
 {
     [Header("Patrol Settings")]
@@ -68,6 +73,8 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
     void Update()
     {
+        // need to check if enemy is dead or not.
+        // enemy's animation can be weird without this.
         if (!enemy.isDead)
         {
             switch (currentState)
@@ -115,23 +122,27 @@ public class PatrolAndChaseEnemy : MonoBehaviour
             agent.pathStatus == NavMeshPathStatus.PathComplete &&
             agent.remainingDistance <= agent.stoppingDistance + 0.05f)
         {
+            // change it's destination when arrived.
             onArrived?.Invoke();
         }
     }
 
     void ChaseBehavior()
     {
+        // chase player by updating destination.
         if (playerTransform != null && !isAttacking)
             agent.SetDestination(playerTransform.position);
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
+        // try attack when player is close enough.
         if (distanceToPlayer <= attackDistance)
         {
             SwitchToAttack();
             return;
         }
 
+        // enemy can get to it's original route if it's hard to chase player.
         if (CanSeePlayer())
         {
             chaseTimer = 0f; // reset if enemy can still see the player
@@ -147,17 +158,20 @@ public class PatrolAndChaseEnemy : MonoBehaviour
     void AttackBehavior()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+        // stop attacking when player is too far to attack.
         if (distanceToPlayer > attackDistance)
         {
             SwitchToChase();
             return;
         }
+        // try attack when it's ready.
         if (Time.time > lastAttackTime + attackCooldown && !isAttacking)
         {
             StartCoroutine(AttackCoroutine());
         }
     }
 
+    // change it's patrol destination to next.
     void SetNextDestination()
     {
         if (patrolTargets.Length == 0) return;
@@ -171,15 +185,12 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         currentState = State.Chase;
         chaseTimer = 0f;
         Debug.Log("Swithed to Chase");
-        // TODO: add sound effects if the state was patrol
     }
 
     void SwitchToPatrol()
     {
         currentState = State.Patrol;
         SetNextDestination();
-
-        // TODO: add sound effects
     }
 
     void SwitchToAttack()
@@ -187,10 +198,12 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         currentState = State.Attack;
     }
 
+    // check if enemy can see the player or not.
     bool CanSeePlayer()
     {
         if (playerTransform == null) return false;
 
+        // eye position should be located over its collider
         Vector3 eyePos = transform.position + Vector3.up * 1.5f;
         Vector3 toPlayer = playerTransform.position - eyePos;
 
@@ -220,6 +233,7 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         return false;
     }
 
+    // matchs enemy's animation and attack timing
     IEnumerator AttackCoroutine()
     {
         isAttacking = true;
@@ -231,7 +245,6 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
         yield return new WaitForSeconds(attackDelay);
 
-        // TODO: Damage to Player
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         if (distanceToPlayer <= attackDistance)
         {
