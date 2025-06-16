@@ -10,7 +10,7 @@ public class PatrolAndChaseEnemy : MonoBehaviour
     private int currentIndex = -1;
 
     [Header("Detection Settings")]
-    [SerializeField] private Transform player;
+    [SerializeField] private Transform playerTransform;
     [SerializeField] private float viewDistance = 10f;
     [SerializeField] private float viewAngle = 90f;
 
@@ -32,16 +32,26 @@ public class PatrolAndChaseEnemy : MonoBehaviour
     private bool isAttacking = false;
     private float lastAttackTime = -999f;
 
+    [Header("Audio Clips")]
+    [SerializeField] private AudioClip attackClip;
+    private AudioSource audioSource;
+
     Animator animator;
+
+    private Enemy enemy;
+    private Player player;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        if (player == null)
+        if (playerTransform == null)
         {
-            player = GameObject.FindGameObjectWithTag("MainCamera").transform;
+            playerTransform = GameObject.FindGameObjectWithTag("MainCamera").transform;
         }
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        enemy = GetComponent<Enemy>();
+        player = FindAnyObjectByType<Player>();
     }
 
     void Start()
@@ -58,25 +68,28 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
     void Update()
     {
-        switch (currentState)
+        if (!enemy.isDead)
         {
-            case State.Patrol:
-                PatrolBehavior();
-                if (CanSeePlayer()) SwitchToChase();
-                break;
+            switch (currentState)
+            {
+                case State.Patrol:
+                    PatrolBehavior();
+                    if (CanSeePlayer()) SwitchToChase();
+                    break;
 
-            case State.Chase:
-                ChaseBehavior();
-                break;
+                case State.Chase:
+                    ChaseBehavior();
+                    break;
 
-            case State.Attack:
-                AttackBehavior();
-                break;
-        }
+                case State.Attack:
+                    AttackBehavior();
+                    break;
+            }
 
-        if (isAttacking)
-        {
-            LookAtPlayer();
+            if (isAttacking)
+            {
+                LookAtPlayer();
+            }
         }
     }
 
@@ -108,10 +121,10 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
     void ChaseBehavior()
     {
-        if (player != null && !isAttacking)
-            agent.SetDestination(player.position);
+        if (playerTransform != null && !isAttacking)
+            agent.SetDestination(playerTransform.position);
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
         if (distanceToPlayer <= attackDistance)
         {
@@ -133,7 +146,7 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
     void AttackBehavior()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         if (distanceToPlayer > attackDistance)
         {
             SwitchToChase();
@@ -176,10 +189,10 @@ public class PatrolAndChaseEnemy : MonoBehaviour
 
     bool CanSeePlayer()
     {
-        if (player == null) return false;
+        if (playerTransform == null) return false;
 
         Vector3 eyePos = transform.position + Vector3.up * 1.5f;
-        Vector3 toPlayer = player.position - eyePos;
+        Vector3 toPlayer = playerTransform.position - eyePos;
 
         float distance = toPlayer.magnitude;
         if (distance > viewDistance) return false;
@@ -213,35 +226,32 @@ public class PatrolAndChaseEnemy : MonoBehaviour
         lastAttackTime = Time.time;
 
         agent.isStopped = true;
-        //agent.enabled = false;
-        // TODO: animator setting
-        // animator.SetTrigger("Attack");
-        animator.SetBool("isAttacking", true);
+
+        animator.SetTrigger("isAttacking");
 
         yield return new WaitForSeconds(attackDelay);
 
         // TODO: Damage to Player
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         if (distanceToPlayer <= attackDistance)
         {
             Debug.Log($"{gameObject.name} attacked!");
+            audioSource.PlayOneShot(attackClip);
+            player.TakeDamage(2);
         }
         yield return new WaitForSeconds(attackDuration - attackDelay);
 
-        
-
-        yield return new WaitForSeconds(0.5f);
-        //agent.enabled = true;
         agent.isStopped = false;
         isAttacking = false;
-        animator.SetBool("isAttacking", false);
 
+        yield return new WaitForSeconds(0.5f);
+        
         SwitchToChase();
     }
 
     void LookAtPlayer()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3 direction = (playerTransform.position - transform.position).normalized;
         direction.y = 0f;
 
         if (direction != Vector3.zero)

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
@@ -18,8 +19,14 @@ public class Enemy : MonoBehaviour
 
     Animator animator;
 
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip dieClip;
+
+    private NavMeshAgent agent;
 
     private Coroutine hideUICoroutine;
+
+    public bool isDead = false;
 
     private void Awake()
     {
@@ -31,7 +38,8 @@ public class Enemy : MonoBehaviour
         }
 
         animator = GetComponent<Animator>();
-
+        audioSource = GetComponent<AudioSource>();
+        agent = GetComponent<NavMeshAgent>();
     }
 
     public void TakeDamage(int damage)
@@ -42,7 +50,7 @@ public class Enemy : MonoBehaviour
         hp = Mathf.Clamp(hp, 0, maxHp);
 
 
-        if (hp <= 0)
+        if (hp <= 0 && !isDead)
         {
             Die();
         }
@@ -54,7 +62,10 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
-        animator.SetBool("isDead", true);
+        animator.SetTrigger("isDead");
+        agent.isStopped = true;
+        audioSource.PlayOneShot(dieClip);
+        isDead = true;
         Destroy(gameObject, 3.5f);
     }
 
