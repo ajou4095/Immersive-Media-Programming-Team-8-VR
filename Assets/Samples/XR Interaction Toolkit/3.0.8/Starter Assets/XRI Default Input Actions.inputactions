@@ -3352,7 +3352,7 @@
                 {
                     "name": "",
                     "id": "2fd7536d-d19d-458f-bf10-6d14205b89a3",
-                    "path": "<OculusTouchController>{RightHand}/gripPressed",
+                    "path": "<OculusTouchController>{RightHand}/{TriggerButton}",
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
