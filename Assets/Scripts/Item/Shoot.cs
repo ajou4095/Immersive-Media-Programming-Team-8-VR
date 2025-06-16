@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.XR;
+
 using System.Collections;
 
+[RequireComponent(typeof(UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable))]
 public class Shoot : MonoBehaviour
 {
     [Header("Shoot Settings")]
@@ -17,21 +19,27 @@ public class Shoot : MonoBehaviour
     [SerializeField] private float lineDisplayTime = 0.05f;
 
     private AudioSource audioSource;
+    private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        grabInteractable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+
         if (bulletLine != null)
             bulletLine.enabled = false;
     }
 
     private void Update()
     {
-        InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-
-        if (rightController.TryGetFeatureValue(CommonUsages.primaryButton, out bool isPressed) && isPressed)
+        if (grabInteractable.isSelected)
         {
-            Fire();
+            InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+
+            if (rightController.TryGetFeatureValue(CommonUsages.primaryButton, out bool isPressed) && isPressed)
+            {
+                Fire();
+            }
         }
     }
 
