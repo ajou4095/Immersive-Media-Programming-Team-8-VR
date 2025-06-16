@@ -18,10 +18,6 @@ public class Enemy : MonoBehaviour
 
     Animator animator;
 
-    [Header("Health Bar UI")]
-    [SerializeField] GameObject healthBarCanvas;   
-    [SerializeField] Slider healthSlider;          
-    [SerializeField] float uiDisplayDuration = 3f; 
 
     private Coroutine hideUICoroutine;
 
@@ -36,16 +32,6 @@ public class Enemy : MonoBehaviour
 
         animator = GetComponent<Animator>();
 
-        if (healthSlider != null)
-        {
-            healthSlider.maxValue = maxHp;
-            healthSlider.value = hp;
-        }
-
-        if (healthBarCanvas != null)
-        {
-            healthBarCanvas.SetActive(true); 
-        }
     }
 
     public void TakeDamage(int damage)
@@ -55,18 +41,6 @@ public class Enemy : MonoBehaviour
         hp -= damage;
         hp = Mathf.Clamp(hp, 0, maxHp);
 
-        if (healthSlider != null)
-            healthSlider.value = hp;
-
-        if (healthBarCanvas != null)
-        {
-            healthBarCanvas.SetActive(true);
-
-            if (hideUICoroutine != null)
-                StopCoroutine(hideUICoroutine);
-
-            hideUICoroutine = StartCoroutine(HideHealthBarAfterDelay());
-        }
 
         if (hp <= 0)
         {
@@ -76,12 +50,7 @@ public class Enemy : MonoBehaviour
         StartCoroutine(DamageCooldownCoroutine());
     }
 
-    private IEnumerator HideHealthBarAfterDelay()
-    {
-        yield return new WaitForSeconds(uiDisplayDuration);
-        if (healthBarCanvas != null)
-            healthBarCanvas.SetActive(false);
-    }
+    
 
     private void Die()
     {
